@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mission_5_habbits/pages/home_page.dart';
+import 'package:mission_5_habbits/pages/home_page2.dart';
+import 'package:mission_5_habbits/pages/login_page.dart';
+import 'package:mission_5_habbits/pages/user_page.dart';
 import 'add_habit.dart'; // pastikan file ini ada
 
 class HomePageMain extends StatefulWidget {
@@ -21,20 +25,38 @@ class _HomePageMainState extends State<HomePageMain> {
       _selectedIndex = index;
     });
 
-    if (index == 1) {
-      // Navigasi ke halaman AddHabitPage
+    if (index == 0) {
+      // Navigasi ke halaman LoginPage
       final newHabit = await Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const AddHabitPage()),
-      );
+        MaterialPageRoute(builder: (_) => const HomePage()),
+        );
+      }
 
-      if (newHabit != null && newHabit is Map<String, dynamic>) {
-        setState(() {
-          habits.add(newHabit);
-        });
+    if (index == 2) {
+      // Navigasi ke halaman LoginPage
+      final newHabit = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const UserPage()),
+      );
+    }
+
+
+      if (index == 1) {
+        // Navigasi ke halaman AddHabitPage
+        final newHabit = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AddHabitPage()),
+        );
+
+        if (newHabit != null && newHabit is Map<String, dynamic>) {
+          setState(() {
+            habits.add(newHabit);
+          });
+        }
       }
     }
-  }
+
 
   @override
   Widget build(BuildContext context) {
