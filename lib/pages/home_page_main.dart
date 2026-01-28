@@ -150,17 +150,20 @@ class _HomePageMainState extends State<HomePageMain> {
                   itemBuilder: (context, index) {
                     final habit = habits[index];
 
-                    String dateStr = habit['date'] != null
-                        ? DateFormat.yMMMd().format(habit['date'])
-                        : '';
-                    String timeStr = habit['time'] != null
-                        ? habit['time'].format(context)
-                        : '';
+                    String dateStr = '';
+                    if (habit['date'] is DateTime) {
+                      dateStr = DateFormat.yMMMd().format(habit['date']);
+                    }
+
+                    String timeStr = '';
+                    if (habit['time'] is TimeOfDay) {
+                      timeStr = habit['time'].format(context);
+                    }
 
                     return Card(
                       margin: const EdgeInsets.symmetric(vertical: 6),
                       child: ListTile(
-                        title: Text(habit['name']),
+                        title: Text(habit['name'] ?? ''),
                         subtitle: Text('$dateStr, $timeStr'),
                       ),
                     );
