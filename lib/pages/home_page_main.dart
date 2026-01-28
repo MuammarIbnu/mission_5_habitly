@@ -1,10 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class HomePageMain extends StatelessWidget {
-  const HomePageMain({super.key});
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const HomePageMain(),
+    );
+  }
+}
+
+class HomePageMain extends StatefulWidget {
+  const HomePageMain({super.key});
+
+  @override
+  State<HomePageMain> createState() => _HomePageMainState();
+}
+
+class _HomePageMainState extends State<HomePageMain> {
+  int _selectedIndex = 0;
+
+  // Navigasi bottom bar
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      if (index == 1) {
+        // Navigasi ke halaman tambah habit
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AddHabitPage()),
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
+    String month = DateFormat.MMMM().format(now); // Nama bulan
+    int day = now.day;
+
+    // Buat daftar hari dan tanggal minggu ini
+    List<String> weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    List<int> weekDates = List.generate(7, (index) => startOfWeek.add(Duration(days: index)).day);
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -12,49 +59,102 @@ class HomePageMain extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 40),
+
               // ===== HEADER =====
-              const SizedBox(height: 60),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Today',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '$month $day',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // ===== HARI & TANGGAL =====
+              SizedBox(
+                height: 80,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 7,
+                  itemBuilder: (context, index) {
+                    bool isToday = weekDates[index] == now.day;
+                    return Container(
+                      margin: const EdgeInsets.only(right: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: isToday ? Colors.blue : Colors.grey[200],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            weekDays[index],
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isToday ? Colors.white : Colors.black54,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${weekDates[index]}',
+                            style: TextStyle(
+                              color: isToday ? Colors.white : Colors.black54,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // ===== MY HABBIT =====
               const Text(
-                'Today',
+                'My Habit',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 6),
-              const Text(
-                'Ini adalah Home Page utama',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black54,
-                ),
-              ),
+              const SizedBox(height: 12),
 
-              const SizedBox(height: 24),
-
-              // ===== GRID MENU =====
+              // Contoh list habit
               Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 1.1,
+                child: ListView(
                   children: const [
-                    _MenuCard(
-                      icon: Icons.person,
-                      title: 'Profile',
+                    Card(
+                      child: ListTile(
+                        leading: Icon(Icons.check_circle_outline),
+                        title: Text('Meditation'),
+                      ),
                     ),
-                    _MenuCard(
-                      icon: Icons.settings,
-                      title: 'Settings',
+                    Card(
+                      child: ListTile(
+                        leading: Icon(Icons.check_circle_outline),
+                        title: Text('Reading'),
+                      ),
                     ),
-                    _MenuCard(
-                      icon: Icons.notifications,
-                      title: 'Notifications',
-                    ),
-                    _MenuCard(
-                      icon: Icons.info,
-                      title: 'About',
+                    Card(
+                      child: ListTile(
+                        leading: Icon(Icons.check_circle_outline),
+                        title: Text('Exercise'),
+                      ),
                     ),
                   ],
                 ),
@@ -63,44 +163,40 @@ class HomePageMain extends StatelessWidget {
           ),
         ),
       ),
+
+      // ===== BOTTOM NAVIGATION =====
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle_outline),
+            label: 'Add',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'User',
+          ),
+        ],
+      ),
     );
   }
 }
 
-// ===== MENU CARD =====
-class _MenuCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-
-  const _MenuCard({
-    required this.icon,
-    required this.title,
-  });
+// ===== HALAMAN ADD HABBIT =====
+class AddHabitPage extends StatelessWidget {
+  const AddHabitPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: () {},
-      child: Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: Colors.black87),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Add New Habit')),
+      body: const Center(
+        child: Text('Halaman untuk menambahkan habit baru'),
       ),
     );
   }
