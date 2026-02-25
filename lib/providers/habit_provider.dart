@@ -13,6 +13,7 @@ class HabitNotifier extends Notifier<AsyncValue<List<Habit>>> {
 
   @override
   AsyncValue<List<Habit>> build() {
+    //{Inline Review: Pertimbangkan lifecycle loading/error eksplisit (mis. AsyncNotifier) untuk bootstrap state yang lebih robust.}
     _box = Hive.box<Habit>('habitsBox');
     return AsyncData(_box.values.toList());
   }

@@ -20,6 +20,7 @@ class _HomePageMainState extends ConsumerState<HomePageMain> {
       return;
     }
 
+    //{Inline Review: Untuk konsistensi arsitektur, index navigasi bisa disimpan di provider sederhana.}
     setState(() {
       _selectedIndex = index;
     });

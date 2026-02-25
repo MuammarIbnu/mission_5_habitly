@@ -28,6 +28,7 @@ void main() async {
 
   // Initialize Hive
   await Hive.initFlutter();
+  //{Inline Review: Tambahkan guard adapter registration untuk mencegah duplicate registration error.}
   Hive.registerAdapter(HabitAdapter()); // daftar adapter Habit
   await Hive.openBox<Habit>('habitsBox'); // nama box konsisten dengan app
 
