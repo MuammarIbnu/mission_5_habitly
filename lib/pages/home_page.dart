@@ -14,7 +14,6 @@ class HomePage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColor.backgroundColor,
-      // const Color(0xFFBDBDBD), // seharusnya menggunakan AppColor
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -80,7 +79,11 @@ class HomePage extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, AppRoutes.homeSplashPage);
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/homeMain',
+                              (route) => false,
+                        );
                       },
                       child: const Text("Skip", style: TextStyle(color: Colors.grey)),
                     ),
@@ -93,7 +96,11 @@ class HomePage extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, AppRoutes.homePage2);
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          AppRoutes.homePage2, // route ke HomePage2
+                              (route) => false,
+                        );
                       },
                       child: const Text("Proceed", style: TextStyle(color: Colors.white)),
                     ),
@@ -169,6 +176,10 @@ class HomePage extends ConsumerWidget {
 
                 if (success) {
                   Navigator.pop(context);
+
+                  // Refresh habit provider agar langsung tampil di HomePageMain / grid
+                  ref.invalidate(habitProvider);
+
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${controller.text} added!")));
                 }
               },

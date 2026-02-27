@@ -33,6 +33,16 @@ class Habit {
         hour = hour ?? 0,
         minute = minute ?? 0;
 
+  DateTime get fullDateTime {
+    return DateTime(
+      date.year,
+      date.month,
+      date.day,
+      hour,
+      minute,
+    );
+  }
+
   Habit copyWith({
     String? id,
     String? title,

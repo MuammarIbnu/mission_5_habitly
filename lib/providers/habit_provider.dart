@@ -84,7 +84,6 @@ class HabitNotifier extends Notifier<AsyncValue<List<Habit>>> {
 
   await _box.put(id, updatedHabit);
 
-  // refresh state
   state = AsyncData(_box.values.toList());
 }
 }

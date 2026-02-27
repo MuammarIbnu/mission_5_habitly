@@ -43,7 +43,7 @@ class AppTheme {
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: AppColor.darkBackground,
       selectedItemColor: Colors.black,
-      unselectedItemColor: Colors.black54,
+      unselectedItemColor: Colors.black,
     ),
   );
 }

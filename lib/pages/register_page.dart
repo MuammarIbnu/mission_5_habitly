@@ -40,17 +40,14 @@ class _RegisterPageState extends State<RegisterPage> {
     final password = passwordController.text.trim();
 
     try {
-      // Create user in Firebase
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // Tunggu sampai FirebaseAuth siap
       final user = FirebaseAuth.instance.currentUser;
 
       if (user != null && context.mounted) {
-        // Success, navigasi ke HomePage
         Navigator.pushReplacementNamed(context, AppRoutes.home);
       } else if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

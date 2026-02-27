@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../providers/habit_provider.dart';
 import 'package:mission_5_habbits/pages/user_page.dart';
 
@@ -78,19 +80,20 @@ class _HomePageMainState extends ConsumerState<HomePageMain> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
               child: const Text("Cancel"),
             ),
             ElevatedButton(
               onPressed: () async {
                 final text = controller.text.trim();
-                if (text.isEmpty || selectedDate == null || selectedTime == null) {
+                if (text.isEmpty ||
+                    selectedDate == null ||
+                    selectedTime == null) {
                   return;
                 }
 
-                final success = await ref.read(habitProvider.notifier).addHabitWithDateTime(
+                final success =
+                await ref.read(habitProvider.notifier).addHabitWithDateTime(
                   title: text,
                   date: selectedDate!,
                   hour: selectedTime!.hour,
@@ -107,7 +110,9 @@ class _HomePageMainState extends ConsumerState<HomePageMain> {
                 } else {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Habit already exists")),
+                      const SnackBar(
+                        content: Text("Habit already exists"),
+                      ),
                     );
                   }
                 }
@@ -153,7 +158,7 @@ class _HomePageMainState extends ConsumerState<HomePageMain> {
   }
 }
 
-/// HOME CONTENT
+/// ================= HOME CONTENT =================
 class _HomeContent extends ConsumerWidget {
   const _HomeContent();
 
@@ -161,7 +166,8 @@ class _HomeContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final habitsAsync = ref.watch(habitProvider);
     DateTime now = DateTime.now();
-    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    DateTime startOfWeek =
+    now.subtract(Duration(days: now.weekday - 1));
 
     return SafeArea(
       child: Padding(
@@ -193,7 +199,20 @@ class _HomeContent extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.person_outline, size: 28),
+                IconButton(
+                  icon: const Icon(Icons.logout_outlined, size: 28),
+                  onPressed: () async {
+                    await FirebaseAuth.instance.signOut();
+
+                    if (context.mounted) {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/login',
+                            (route) => false,
+                      );
+                    }
+                  },
+                ),
               ],
             ),
 
@@ -203,8 +222,10 @@ class _HomeContent extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: List.generate(7, (index) {
-                final day = startOfWeek.add(Duration(days: index));
-                final isToday = day.day == now.day && day.month == now.month;
+                final day =
+                startOfWeek.add(Duration(days: index));
+                final isToday =
+                    day.day == now.day && day.month == now.month;
 
                 return Column(
                   children: [
@@ -218,13 +239,17 @@ class _HomeContent extends ConsumerWidget {
                       height: 34,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isToday ? Colors.black : Colors.grey.shade400,
+                        color: isToday
+                            ? Colors.black
+                            : Colors.grey.shade400,
                         shape: BoxShape.circle,
                       ),
                       child: Text(
                         '${day.day}',
                         style: TextStyle(
-                          color: isToday ? Colors.white : Colors.black,
+                          color: isToday
+                              ? Colors.white
+                              : Colors.black,
                         ),
                       ),
                     ),
@@ -248,21 +273,48 @@ class _HomeContent extends ConsumerWidget {
             /// HABIT LIST
             Expanded(
               child: habitsAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(child: Text("Error: $e")),
+                loading: () => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                error: (e, _) =>
+                    Center(child: Text("Error: $e")),
                 data: (habits) {
                   if (habits.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'No habits yet ✨',
-                        style: TextStyle(color: Colors.black54),
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment:
+                        MainAxisAlignment.center,
+                        children: const [
+                          Icon(
+                            Icons.event_note,
+                            size: 80,
+                            color: Colors.black26,
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'Belum ada habit yang dicatat',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Tekan tombol Add untuk mulai',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black38,
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   }
 
                   return ListView.separated(
                     itemCount: habits.length,
-                    separatorBuilder: (_, __) => Divider(color: Colors.grey.shade500),
+                    separatorBuilder: (_, __) =>
+                        Divider(color: Colors.grey.shade500),
                     itemBuilder: (context, index) {
                       final habit = habits[index];
 
@@ -271,25 +323,30 @@ class _HomeContent extends ConsumerWidget {
                         leading: Checkbox(
                           value: habit.isCompleted,
                           onChanged: (_) {
-                            ref.read(habitProvider.notifier).toggleHabit(habit.id);
+                            ref
+                                .read(habitProvider.notifier)
+                                .toggleHabit(habit.id);
                           },
+                        ),
+                        subtitle: Text(
+                          "${DateFormat.yMMMMd().format(habit.date)} • ${habit.hour.toString().padLeft(2, '0')}:${habit.minute.toString().padLeft(2, '0')}",
                         ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            /// EDIT BUTTON
                             IconButton(
                               icon: const Icon(Icons.edit),
                               onPressed: () {
-                                _showEditDialog(context, ref, habit);
+                                _showEditDialog(
+                                    context, ref, habit);
                               },
                             ),
-
-                            /// DELETE BUTTON
                             IconButton(
                               icon: const Icon(Icons.delete),
                               onPressed: () {
-                                ref.read(habitProvider.notifier).deleteHabit(habit.id);
+                                ref
+                                    .read(habitProvider.notifier)
+                                    .deleteHabit(habit.id);
                               },
                             ),
                           ],
@@ -305,12 +362,14 @@ class _HomeContent extends ConsumerWidget {
       ),
     );
   }
+
   void _showEditDialog(
       BuildContext context,
       WidgetRef ref,
       dynamic habit,
       ) {
-    final controller = TextEditingController(text: habit.title);
+    final controller =
+    TextEditingController(text: habit.title);
     DateTime selectedDate = habit.date;
     TimeOfDay selectedTime =
     TimeOfDay(hour: habit.hour, minute: habit.minute);
@@ -332,16 +391,18 @@ class _HomeContent extends ConsumerWidget {
               const SizedBox(height: 12),
               ListTile(
                 title: Text(
-                  DateFormat.yMMMMd().format(selectedDate),
-                ),
-                trailing: const Icon(Icons.calendar_today),
+                    DateFormat.yMMMMd().format(selectedDate)),
+                trailing:
+                const Icon(Icons.calendar_today),
                 onTap: () async {
                   final now = DateTime.now();
                   final date = await showDatePicker(
                     context: context,
                     initialDate: selectedDate,
-                    firstDate: now.subtract(const Duration(days: 365)),
-                    lastDate: DateTime(now.year + 5),
+                    firstDate:
+                    now.subtract(const Duration(days: 365)),
+                    lastDate:
+                    DateTime(now.year + 5),
                   );
                   if (date != null) {
                     setState(() => selectedDate = date);
@@ -350,7 +411,8 @@ class _HomeContent extends ConsumerWidget {
               ),
               ListTile(
                 title: Text(selectedTime.format(context)),
-                trailing: const Icon(Icons.access_time),
+                trailing:
+                const Icon(Icons.access_time),
                 onTap: () async {
                   final time = await showTimePicker(
                     context: context,
@@ -365,23 +427,29 @@ class _HomeContent extends ConsumerWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () =>
+                  Navigator.pop(context),
               child: const Text("Cancel"),
             ),
             ElevatedButton(
               onPressed: () async {
-                final newTitle = controller.text.trim();
+                final newTitle =
+                controller.text.trim();
                 if (newTitle.isEmpty) return;
 
-                await ref.read(habitProvider.notifier).editHabit(
+                await ref
+                    .read(habitProvider.notifier)
+                    .editHabit(
                   id: habit.id,
                   newTitle: newTitle,
                   newDate: selectedDate,
                   newHour: selectedTime.hour,
-                  newMinute: selectedTime.minute,
+                  newMinute:
+                  selectedTime.minute,
                 );
 
-                if (context.mounted) Navigator.pop(context);
+                if (context.mounted)
+                  Navigator.pop(context);
               },
               child: const Text("Save"),
             ),

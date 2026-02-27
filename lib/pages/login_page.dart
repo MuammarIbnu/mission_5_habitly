@@ -14,7 +14,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  bool isLoading = false; // untuk loading indicator
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -44,7 +44,6 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => isLoading = true);
 
     try {
-      // login dengan Firebase
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mission_5_habbits/theme/app_color.dart';
 import '../providers/habit_provider.dart';
-import '../routes.dart';
 
 class HomePage2 extends ConsumerWidget {
   const HomePage2({super.key});
@@ -162,7 +161,7 @@ class FinishButton extends StatelessWidget {
         onPressed: () {
           Navigator.pushReplacementNamed(
             context,
-            AppRoutes.homeSplashPage,
+            '/homeMain',
           );
         },
         child: const Text(
